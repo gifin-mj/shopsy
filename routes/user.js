@@ -5,7 +5,12 @@ var prodHelp=require('../helpers/product-helpers')
 var userHelp=require('../helpers/user-helpers')
 /* GET home page. */
 
-
+const verifyLogin=(req,res,next)=>{
+  if (req.session.loggedIn)
+  next()
+  else
+  res.redirect('/userlogin')
+}
 router.get('/', function(req, res, next) {
 
   let user=req.session.user
@@ -17,7 +22,13 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/userlogin',(req,res)=>{
-  res.render('user/userlogin',{admin:false})
+  if(req.session.loggedIn)
+  res.redirect('/')
+  else
+  {
+    res.render('user/userlogin',{admin:false,logErr:req.session.logErr})
+    req.session.logErr=null
+}
 })
 
 router.get('/user-register',(req,res)=>{
@@ -26,8 +37,7 @@ router.get('/user-register',(req,res)=>{
 
 router.post('/user-register',(req,res)=>{
   userHelp.signup(req.body).then((response)=>{
-    console.log(response);
-    res.render('user/userlogin',{admin:false})
+        res.render('user/userlogin',{admin:false})
   }
   )
 })
@@ -43,12 +53,32 @@ router.post('/userlogin',(req,res)=>{
       res.redirect('/')
     }
       else
-      res.redirect('/userlogin')
+      {
+       req.session.logErr=true //"invalid user or password"
+        res.redirect('/userlogin')
+      }
   })
 })
 router.get('/userlogout',(req,res)=>{
   req.session.destroy()
   res.redirect('/')
 })
+router.get('/cart',verifyLogin,(req,res,next)=>{
+  let user=req.session.user
+  res.render('user/cart',{user})
+})
+
+router.get('/add-to-cart/:id',verifyLogin,(req,res,next)=>{
+  let userid=req.session.user._id
+  let prodId=req.params.id
+  
+    userHelp.addtocart(userid,prodId).then((responce)=>{
+      console.log(responce);
+      res.redirect('/')
+    })
+  
+})
+
+
 
 module.exports = router;
