@@ -11,12 +11,18 @@ const verifyLogin=(req,res,next)=>{
   else
   res.redirect('/userlogin')
 }
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
 
   let user=req.session.user
-  console.log(user);
+  let cartcount=null
+  if (req.session.user){
+      userHelp.getCartcount(user._id).then((count)=>{
+       cartcount=count
+     })
+    
+  }
   prodHelp.viewProduct().then((prods)=>{
-    res.render('user/user-viewproducts', { prods,user,admin:false});
+    res.render('user/user-viewproducts', { prods,user,cartcount,admin:false});
   })
   
 });
@@ -65,18 +71,37 @@ router.get('/userlogout',(req,res)=>{
 })
 router.get('/cart',verifyLogin,(req,res,next)=>{
   let user=req.session.user
-  res.render('user/cart',{user})
+  let userid=req.session.user._id
+  let cartcount=null
+  if (req.session.user){
+    userHelp.getCartcount(user._id).then((count)=>{
+     cartcount=count
+   })
+  
+}
+  let products=userHelp.viewCart(userid).then((products)=>{
+    // console.log(products);
+    res.render('user/cart',{user,cartcount,products})
+  })
+  
 })
 
 router.get('/add-to-cart/:id',verifyLogin,(req,res,next)=>{
   let userid=req.session.user._id
   let prodId=req.params.id
-  
-    userHelp.addtocart(userid,prodId).then((responce)=>{
-      console.log(responce);
-      res.redirect('/')
+  console.log("caome");
+   userHelp.addtocart(userid,prodId).then((response)=>{
+           res.json({status:true})
     })
   
+})
+router.post('/change-product-quantity',(req,res,next)=>{
+
+  userHelp.changeproductQuantity(req.body).then((response)=>{
+    
+    res.json({status:true})
+  })
+
 })
 
 

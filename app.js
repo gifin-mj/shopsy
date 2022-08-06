@@ -9,14 +9,15 @@ var db=require('./config/connection')
 var session =require('express-session')
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
-
+var helpers = require('handlebars-helpers')();
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
-app.engine('hbs', hbs.engine({extname:'hbs',defaultLayout :'layout', layoutsDir :__dirname+'/views/layouts',partialsDir:__dirname+'/views/partials'}))
+app.engine('hbs', hbs.engine({extname:'hbs',defaultLayout :'layout', layoutsDir :__dirname+'/views/layouts',partialsDir:__dirname+'/views/partials',helpers:helpers}))
 app.use(logger('dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
