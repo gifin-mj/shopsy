@@ -6,6 +6,7 @@ const bcrypt=require('bcrypt')
 const { ObjectId } = require('mongodb')
 const { CART_COLLECTION, PRODUCT_COLLECTION } = require('../config/collections')
 const { response } = require('express')
+const collections = require('../config/collections')
 
 module.exports={
     signup:(userdata)=>{
@@ -43,10 +44,11 @@ module.exports={
         
 
     },
-    addtocart:(userId,prodId)=>{
+    addtocart:(userId,prod)=>{
+        prodId=prod.prodId
         prodObj={
             item:ObjectId(prodId),
-            quantity:1
+            quantity:1,
         }
         return new promise((resolve,reject)=>{
             let usercart = db.get().collection(collection.CART_COLLECTION).findOne({userId:ObjectId(userId)}).then((usercart)=>{
@@ -68,8 +70,8 @@ module.exports={
                             db.get().collection(collection.CART_COLLECTION).updateOne({userId:ObjectId(userId),'products.item':ObjectId(prodId)},
                             {
                                 $inc:{
-                                    'products.$.quantity':1
-                                }
+                                    'products.$.quantity':1,
+                                },
                             }).then(()=>{
                                 resolve()
                             })
@@ -113,26 +115,12 @@ module.exports={
                 },{
                     $project:{
                         item:1,quantity:1,
-                        product:{$arrayElemAt:['$product',0]}
-                    }
+                        product:{$arrayElemAt:['$product',0]},
+                    },
                 }
-               /* {
-                    $lookup:{
-                        from:collection.PRODUCT_COLLECTION,
-                        let:{proList:'$products'},
-                        pipeline:[
-                            {
-                                $match:{
-                                    $expr:{
-                                        $in:['$_id',"$$proList"]
-                                    }
-                                }
-                            }
-                        ],
-                        as:'cartItems'
-                    }
-                }*/
+               
             ]).toArray()
+            console.log(cartItems);
            
             resolve(cartItems )
         })
@@ -162,5 +150,83 @@ changeproductQuantity:(details)=>{
             })
         })
 
+    },
+    deletecartProduct:(userId,prodId)=>{
+        return new promise((resolve,reject)=>{
+            db.get().collection(collection.CART_COLLECTION).updateOne({userId:ObjectId(userId)},
+            {
+                $pull:{
+                    products:{item:ObjectId(prodId)}
+                },
+            }).then(()=>{
+                resolve(true)
+            })
+        })
+    },
+    getTotalAmount:(userId)=>{
+        return new promise(async(resolve,reject)=>{
+            let total = await db.get().collection(collection.CART_COLLECTION).aggregate([
+                {
+                    $match:{userId:ObjectId(userId)}
+                },{
+                    $unwind:'$products'
+                },{
+                    $project:{
+                        item:'$products.item',
+                        quantity:'$products.quantity'
+                    }
+                },{
+                    $lookup:{
+                        from:collection.PRODUCT_COLLECTION,
+                        localField:'item',
+                        foreignField:'_id',
+                        as:'product'
+                    }
+                },{
+                    $project:{
+                        item:1,quantity:1,
+                        product:{$arrayElemAt:['$product',0]},
+                    },
+                },{
+                    $group:{
+                        _id:null,
+                        total:{$sum:{$multiply:['$quantity','$product.price']}}
+                    }
+                }
+               
+            ]).toArray()           
+            resolve(total[0].total)
+        })
+    },
+    getCartproductList:(userId)=>{
+        return new promise(async(resolve,reject)=>{
+            let cart=await db.get().collection(collections.CART_COLLECTION).findOne({userId:ObjectId(userId)})
+            resolve(cart.products)
+        })
+    },
+    placeOrder:(order,products,total)=>{
+        let status = order['payment-method'] === 'COD' ? "Placed" : "Pending"
+        let orderobj={
+            userId:ObjectId(order.userId),
+            delivery:{
+                address:order.address,
+                pincode:order.pincode,
+                mobile:order.mobile
+            },
+            products:products,
+            totalamount:total,
+            paymentmethod:order['payment-method'],
+            orderdate:new Date(),
+            status:status
+        }
+        return new promise((resolve,reject)=>{
+           
+            //  console.log(order,products,total);
+            db.get().collection(collection.ORDER_COLLECTION).insertOne(orderobj).then(()=>{
+                db.get().collection(collection.CART_COLLECTION).deleteOne({userId:ObjectId(order.userId)})
+                resolve()
+            })
+
+        })
     }
 }

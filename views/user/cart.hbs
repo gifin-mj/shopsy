@@ -1,11 +1,12 @@
-<section class="h-100">
-  <div class="container h-100 py-5">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-10">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="h-100" >
+  <div class="container h-100 py-5" >
+    <div class="d-flex justify-content-between align-items-center mb-4 " >
           <h3 class="fw-normal mb-0 text-black">Shopping Cart</h3>
         </div>
+    <div class="row d-flex justify-content-center align-items-center h-100" style="overflow-y:auto">
+      <div class="col-10"  >
+
+        
  {{#each products}}
         <div class="card rounded-3 mb-4">
           <div class="card-body p-4">
@@ -24,35 +25,37 @@
             
               <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
                 <button {{#eq this.quantity 1}} disabled{{/eq}} class="btn btn-link px-2" id="{{this.product._id}}minus"
-                  onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">
+                  onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1,-({{this.product.price}}))">
                   <i class="fas fa-minus"></i>
                 </button>
                 
                
 
-                <input  min="0" name="quantity" value={{this.quantity}} id="{{this.product._id}}quantity"  type="number"
+                <input  min="0" name="quantity" value={{this.quantity}} id="{{this.product._id}}quantity" disabled  type="number"
                   class="form-control form-control-sm" />
 
                 <button class="btn btn-link px-2"
-                  onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">
+                  onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1,({{this.product.price}}))">
                   <i class="fas fa-plus"></i>
                 </button>
               </div>
               <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                <h5 class="mb-0" id="totalprice" >$499.00</h5>
+                <input type="text" id="{{this.product._id}}totalprice" value={{#multiply this.product.price this.quantity }}{{/multiply}}  class="form-control-plaintext"/>
               </div>
               <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                <a href="#!" class="text-danger"><i class="fas fa-trash fa-lg"></i></a>
+                <a href="/delete-product-cart/{{this.product._id}}" class="text-danger" onClick="return confirm('Deleting {{this.product.pname}} Are you sure? ')"><i class="fas fa-trash fa-lg"></i></a>
               </div>
             </div>
           </div>
         </div>
      
 {{/each}}
-
-        <div class="card">
-          <div class="card-body">
-            <button type="button" class="btn btn-warning btn-block btn-lg">Proceed to Pay</button>
+          <div class="card mb-4">
+          <div class="card-body row d-flex justify-content-between align-items-center">
+            <div class="alert alert-info" role="alert">
+            <h3 id="total" style="padding-left: 35%;">Total Price ₹  <span id="carttotal">{{total}}</span> </h3> 
+            </div>
+           <a href="/place-order" class="btn btn-warning btn-block btn-lg" >Proceed to Pay</a> 
           </div>
         </div>
 

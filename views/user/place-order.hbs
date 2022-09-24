@@ -1,0 +1,99 @@
+<section class="h-100 h-custom" style="background-color: #eee;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-lg-8 col-xl-6 ">
+        <div class="card border-top border-bottom border-3" style="border-color: #161514 !important;">
+          <form method="post" action="" id="checkout-form">
+          <div class="card-body p-5">
+
+            <p class="lead fw-bold mb-2" style="color: #161514;">Payment and Order  </p>
+            <hr>
+
+            <div class="row">
+              <div class="form-group shadow-textarea ">
+                    <textarea class="form-control z-depth-1" required id="" name="address" rows="3" placeholder="Address To be deliverd"></textarea>
+              </div>
+              <br/><br/><br/><br/>
+              <div class="form-group shadow-textarea ">
+                   <input type="text" class="form-control z-depth-1" placeholder="Pincode" name="pincode"/>
+              </div>
+              <br/><br/>
+              <div class="form-group shadow-textarea">
+                    <input type="text" class="form-control z-depth-1" placeholder="Mobile" name="mobile"/>
+              </div>
+              <input type="text" name="userId" value="{{user._id}}" hidden >
+            </div>
+
+            <div class="mx-n5 px-5 py-4 mt-2" style="background-color: #f2f2f2;">
+              <h4>Items</h4>
+              <div class="row">
+                <div class="col-md-8 col-lg-3">
+                  <p>Product</p>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                  <p>Quantity</p>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                  <p>Price</p>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                  <p>Price</p>
+                </div>
+              </div>
+          {{#each products}}
+              <div class="row">
+                <div class="col-md-8 col-lg-3">
+                  <p>{{this.product.pname}}</p>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                  <p>  {{this.quantity}}</p>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                  <p>{{this.product.price}}</p>
+                </div>
+                  <div class="col-md-4 col-lg-3">
+                  <p>{{#multiply this.product.price this.quantity }}{{/multiply}}</p>
+                </div>
+                
+              </div>
+            {{/each}}
+            </div>
+
+            <div class="row my-4">
+              <div class="col-md-4 offset-md-8 col-lg-6 offset-lg-7">
+                <p class="lead fw-bold mb-0" style="color: #f37a27;">Total {{total}}</p>
+              </div>
+            </div>
+            <hr>
+           <strong> Payment Method </strong>&emsp;&emsp;  
+                <input required type="radio" name="payment-method" value="COD" checked > COD &emsp; 
+                <input type="radio" name="payment-method" value="ONLINE">  Online Payment
+            <hr>
+            <div class="row my-4">
+              <div class="col-md-4 offset-md-8 col-lg-6 offset-lg-7">
+                 <input type="submit" class="btn btn-primary btn-lg btn-block" value="Confirm Order">
+              </div>
+            </div>
+                   
+                </div>  
+                </form>     
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+    $('#checkout-form').submit((e)=>{
+      e.preventDefault()
+      $.ajax({
+        url:'/place-order',
+        method:'post',
+        data:$("#checkout-form").serialize(),
+        success:(response)=>{
+          if(response.status)
+            alert(response)
+        }
+      })
+    })
+</script>
