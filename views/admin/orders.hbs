@@ -1,8 +1,6 @@
-
-
 <table id="orders">
   <tr> 
-      <h1 style="text-align: center;">Order Summary</h1>
+      <h1 style="text-align: center;">Orders Placed</h1>
   </tr>
   <tr>
     <th>Date</th>
@@ -25,7 +23,7 @@
     <td> {{this.paymentmethod}} </td> 
     <td> {{this.status}} </td>
     <td> {{this.shippingstatus}} </td>
-    <td> <a class="btn btn-primary" href="/vieworderproducts/{{this._id}}"> View products  </td>    
+    <td> <a class="btn btn-primary" href="/admin/updateorder/{{this._id}}"> Approve Order for Shipping  </td>    
   </tr>
 {{/each}}
   </table>

@@ -67,6 +67,29 @@ module.exports={
                 })
 
         })
+    },
+    getPlacedOrders:()=>{
+        return new promise((resolve,reject)=>{
+            let orders=db.get().collection(collection.ORDER_COLLECTION).find({status:'Placed'}).toArray()
+            console.log(orders);
+            resolve(orders)
+        })
+        
+    },
+    updateOrder:(orderId)=>{
+        return new promise(async(resolve,reject)=>{
+            await db.get().collection(collection.ORDER_COLLECTION).updateOne(
+                {
+                    _id:ObjectId(orderId)
+                },{
+                    $set:{
+                        shippingstatus:'shipped'
+                    }
+                }
+                ).then((response)=>{
+                    resolve(response)
+                })
+        })
     }
     
 }

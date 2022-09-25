@@ -1,4 +1,5 @@
 var express = require('express');
+const productHelpers = require('../helpers/product-helpers');
 var router = express.Router();
 var prodHelp = require('../helpers/product-helpers')
 
@@ -61,6 +62,20 @@ router.post('/update-product/:id',(req,res)=>{
 router.get('/delete-product/:id',(req,res)=>{
   let prodId=req.params.id
   prodHelp.deleteProduct(prodId).then((response)=>{
+    res.redirect('/admin')
+  })
+})
+
+router.get('/orders',async(req,res)=>{
+  await productHelpers.getPlacedOrders().then((orders)=>{
+    res.render('admin/orders',{orders,admin:true})
+  })
+  
+})
+router.get('/updateorder/:id',async (req,res)=>{
+  let orderId=req.params.id
+  console.log(orderId);
+  await prodHelp.updateOrder(orderId).then((response)=>{
     res.redirect('/admin')
   })
 })
