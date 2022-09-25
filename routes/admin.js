@@ -17,8 +17,7 @@ router.get('/product',(req,res)=>{
 
 router.get('/product/:id',(req,res)=>{
   prodId=req.params.id
-  prodHelp.viewOne(prodId).then((response)=>{
-    prods=response
+  prodHelp.viewOne(prodId).then((prods)=>{
     res.render('admin/product',{prods,admin:true})
   })
   

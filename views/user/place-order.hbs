@@ -83,6 +83,7 @@
     </div>
   </div>
 </section>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     $('#checkout-form').submit((e)=>{
       e.preventDefault()
@@ -91,9 +92,59 @@
         method:'post',
         data:$("#checkout-form").serialize(),
         success:(response)=>{
-          if(response.status)
-            alert(response)
+          if(response.codsuccess)
+            window.location='/orderplaced'
+          else{
+            razorPayPayment(response)
+          }
         }
       })
     })
+    function razorPayPayment(order){
+      var options = {
+    "key": "rzp_test_0SBwdCTvV4HzHE", // Enter the Key ID generated from the Dashboard
+    "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Shopsy",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        /*alert(response.razorpay_payment_id);
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature)*/
+        verifyPayment(response,order)
+    },
+    "prefill": {
+        "name": "Gifin ",
+        "email": "gifin@example.com",
+        "contact": "8606199403"
+    },
+    "notes": {
+        "address": "Shopsy"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.open();
+    }
+    function verifyPayment(payment,order)
+    {
+      $.ajax({
+        url:'/verify-payment',
+        method:'post',
+        data:{
+          payment:payment,
+          order:order
+        },
+        success:(response)=>{
+          if(response.status){
+            window.location='/orderplaced'
+          }
+
+        }
+      })
+    }
 </script>
