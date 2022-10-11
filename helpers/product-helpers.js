@@ -6,9 +6,29 @@ const { resolve, reject } = require('promise')
 const { PRODUCT_COLLECTION } = require('../config/collections')
 const { response } = require('express')
 const { ObjectId } = require('mongodb')
+const bcrypt = require("bcrypt");
 
 
 module.exports={
+    adminlogin:(userdata)=>{
+        return new promise(async (resolve, reject) => {
+            let loginStatus = false;
+            let response = {};
+            let user = await db
+              .get()
+              .collection(collection.USER_COLLECTION)
+              .findOne({ uemail: userdata.email , usertype:'admin' });
+            if (user) {
+              bcrypt.compare(userdata.password, user.password).then((status) => {
+                if (status) {
+                  response.user = user;
+                  response.loginStatus = status;
+                  resolve(response);
+                } else resolve({ loginStatus: false });
+              });
+            } else resolve({ loginStatus: false });
+          });
+    },
 
     addProduct:(prods)=>{
         return new Promise(async(resolve,reject)=>{

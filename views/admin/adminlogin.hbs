@@ -1,0 +1,48 @@
+<section class="vh-100" style="background-color: #eee; padding-left: 400px;">
+  <div class="container h-100">
+    <div class="row d-flex justify-content-center align-items-center h-50 w-50">
+      <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Admin Login</p>
+      <form action="admin/adminlogin" method="post">
+     
+        {{#if logErr}}
+          <div class="alert alert-danger" role="alert">
+            Invalid Email or password
+          </div>
+        {{/if}}
+        <div class="form-outline mb-4">
+
+          <input
+            type="email"
+            id="form2Example1"
+            class="form-control"
+            name="email"
+            placeholder="Email"
+            required
+          />
+
+        </div>
+
+       
+        <div class="form-outline mb-4">
+
+          <input
+            type="password"
+            id="form2Example2"
+            class="form-control"
+            name="password"
+            placeholder="Password"
+            required
+          />
+
+        </div>
+
+        <input
+          type="submit"
+          class="btn btn-primary btn-block mb-4"
+          value="Sign in"
+        />
+
+      </form>
+    </div>
+  </div>
+</section>

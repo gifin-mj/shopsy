@@ -7,7 +7,7 @@ var userHelp = require("../helpers/user-helpers");
 /* GET home page. */
 
 const verifyLogin = (req, res, next) => {
-  if (req.session.loggedIn) next();
+  if (req.session.userloggedIn) next();
   else res.redirect("/userlogin");
 };
 router.get("/", function (req, res, next) {
@@ -29,7 +29,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/userlogin", (req, res) => {
-  if (req.session.loggedIn) res.redirect("/");
+  if (req.session.userloggedIn) res.redirect("/");
   else {
     res.render("user/userlogin", { admin: false, logErr: req.session.logErr });
     req.session.logErr = null;
@@ -49,8 +49,8 @@ router.post("/user-register", (req, res) => {
 router.post("/userlogin", (req, res) => {
   userHelp.login(req.body).then((response) => {
     if (response.loginStatus) {
-      req.session.loggedIn = true;
       req.session.user = response.user;
+      req.session.userloggedIn = true;
       res.redirect("/");
     } else {
       req.session.logErr = true; //"invalid user or password"
@@ -59,7 +59,8 @@ router.post("/userlogin", (req, res) => {
   });
 });
 router.get("/userlogout", (req, res) => {
-  req.session.destroy();
+  req.session.user=null
+  req.session.userloggedIn = false;
   res.redirect("/");
 });
 router.get("/cart", verifyLogin, async (req, res, next) => {
