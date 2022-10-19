@@ -32,6 +32,7 @@ module.exports={
 
     addProduct:(prods)=>{
         return new Promise(async(resolve,reject)=>{
+                prods.price=parseInt(prods.price)
                 await db.get().collection(collection.PRODUCT_COLLECTION).insertOne(prods).then((result)=>{
                 let lastid=JSON.stringify(result.insertedId)
                 resolve(lastid.split('"').join(''))

@@ -53,7 +53,6 @@ router.get('/product/:id',(req,res)=>{
 
 
 router.post('/product',(req,res)=>{
-
   prodHelp.addProduct(req.body).then((id)=>{
     
     let image=req.files.image
@@ -61,7 +60,7 @@ router.post('/product',(req,res)=>{
       if(err)
         console.log(err);
       else
-        res.redirect('admin/products')
+        res.redirect('/admin/products')
     })
     
   })
