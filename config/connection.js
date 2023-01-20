@@ -5,7 +5,7 @@ const state={
 }
 
 module.exports.connect=function(done){
-    const url="mongodb+srv://gifin:gifin@cluster0.whs3vkt.mongodb.net/?retryWrites=true&w=majority" //url="mongodb://localhost:27017"
+    const url="mongodb://localhost:27017" //"mongodb+srv://gifin:gifin@cluster0.whs3vkt.mongodb.net/?retryWrites=true&w=majority"
     const dbname="shopping"
 
     mongoclient.connect(url,(err,data)=>{
